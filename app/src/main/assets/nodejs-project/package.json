@@ -1,0 +1,18 @@
+{
+  "name": "native-gradle-node-project",
+  "version": "0.0.1",
+  "description": "node part of the project",
+  "main": "main.js",
+  "author": "Axaris",
+  "license": "",
+  "dependencies": {
+    "express": "^4.18.2",
+    "https": "^1.0.0",
+    "socket.io": "^4.7.2",
+    "teeworlds": "^2.5.0",
+    "text-encoding": "^0.7.0"
+  },
+  "devDependencies": {
+    "axios": "^1.6.2"
+  }
+}
