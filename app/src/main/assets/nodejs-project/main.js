@@ -51,9 +51,9 @@ io.on('connection', (javaServer) => {
 
 			} 
 		
-			//client = new teeworlds.Client(ip, port, "Axaris");
+	//client = new teeworlds.Client(ip, port, "Axaris");
 
-			client = new teeworlds.Client("51.91.30.52", 8404, "Axaris");
+			client = new teeworlds.Client("51.91.30.52", 8404, "Ax");
 			client.connect();
 			
 			client.on("message", message => {
@@ -77,6 +77,24 @@ io.on('connection', (javaServer) => {
 				*/
 			   // var msg = message.author.ClientInfo.name + ": " + message.message;
 				io.emit("chatMessage", message);
+			});
+			
+			client.on("snapshot", () => {
+				var snapshot = [];
+
+				for (var id = 0;id<128;id++){
+					   snapshot.push({ 
+							"ClientInfo" : client.SnapshotUnpacker.getObjClientInfo(id),
+							"PlayerInfo"  :  client.SnapshotUnpacker.getObjPlayerInfo(id),
+							"Character"       : client.SnapshotUnpacker.getObjCharacter(id)
+						});
+
+				
+				
+				}
+				
+				io.emit("snapshot", snapshot);
+				
 			});
 		}
 	});
