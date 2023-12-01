@@ -1,11 +1,11 @@
 package com.example.myapplication;
 
-public class Snapshot {
+public class Client {
     private ClientInfo clientInfo;
     private PlayerInfo playerInfo;
     private Character character;
 
-    public Snapshot(ClientInfo clientInfo, PlayerInfo playerInfo, Character character) {
+    public Client(ClientInfo clientInfo, PlayerInfo playerInfo, Character character) {
         this.clientInfo = clientInfo;
         this.playerInfo = playerInfo;
         this.character = character;

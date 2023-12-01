@@ -13,6 +13,8 @@ import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.Window;
+import android.view.WindowManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -47,6 +49,7 @@ import io.socket.emitter.Emitter;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -64,12 +67,28 @@ public class MainActivity extends AppCompatActivity {
     private Server selectedServer;
 
     private WebView myWebView;
-    private List<Snapshot> snapshots = new ArrayList<>();
+
+    Client[] clients = new Client[128];
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        try
+        {
+            this.getSupportActionBar().hide();
+        }
+        catch (NullPointerException e){}
+
+       /* View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
+        decorView.setSystemUiVisibility(uiOptions);
+*/
         setContentView(R.layout.activity_main);
 
         //starts node js
@@ -187,11 +206,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                myWebView.evaluateJavascript(javascript.init,null);
+                        myWebView.evaluateJavascript(javascript.init, null);
+
             }
         });
 
-        myWebView.loadUrl("https://ddnet.org/mappreview/?map=Firewatch");
+        myWebView.loadUrl("https://ddnet.org/mappreview/?map=HDP_Obstaculos");
 
 
 
@@ -200,30 +220,41 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private Emitter.Listener onSnapshot = args -> runOnUiThread(() -> {
-        JSONArray data = (JSONArray) args[0];
-        Gson gson = new Gson();
+
 
         try {
+            myWebView.evaluateJavascript("updateSnapshot("+args[0]+")",null);
+
+            //parsing clients/snapshot to java
+            /*
+                   JSONArray data = (JSONArray) args[0];
+        Gson gson = new GsonBuilder()
+                .serializeNulls() // Přidává null hodnoty do JSONu při serializaci. Při deserializaci Gson implicitně nastavuje na null, pokud klíč chybí.
+                .create();
 
             for (int id = 0; id < data.length(); id++) {
                 JSONObject snapshotObj = data.getJSONObject(id);
 
 
+                //parsing clients/snapshot to java
+                if (snapshotObj.has("ClientInfo") && snapshotObj.getJSONObject("ClientInfo").length() > 0) {
 
-                ClientInfo clientInfo = gson.fromJson(snapshotObj.getJSONObject("ClientInfo").toString(), ClientInfo.class);
-                PlayerInfo playerInfo = gson.fromJson(snapshotObj.getJSONObject("PlayerInfo").toString(), PlayerInfo.class);
-                Character character = gson.fromJson(snapshotObj.getJSONObject("Character").toString(), Character.class);
+                    ClientInfo clientInfo = gson.fromJson(snapshotObj.getJSONObject("ClientInfo").toString(), ClientInfo.class);
+                    PlayerInfo playerInfo = gson.fromJson(snapshotObj.getJSONObject("PlayerInfo").toString(), PlayerInfo.class);
+                    Character character = null;
+                    if (snapshotObj.has("Character") && snapshotObj.getJSONObject("Character").length() > 0) {
+                        character = gson.fromJson(snapshotObj.getJSONObject("Character").toString(), Character.class);
+                    }
 
-                Snapshot newSnapshot = new Snapshot(clientInfo, playerInfo, character);
+                    Client newSnapshot = new Client(clientInfo, playerInfo, character);
 
-                //update existing snapshots
-                snapshots.set(id, newSnapshot);
-            }
+                    //update existing snapshots
+                        clients[id] = newSnapshot;
+                    }
+            }*/
         } catch (Exception e) {
 
         }
-
-
     });
 
     private Emitter.Listener onNewMessage = new Emitter.Listener() {
@@ -288,7 +319,7 @@ public class MainActivity extends AppCompatActivity {
                 setupRecyclerView(sortedServers);
 
             } catch (Exception e) {
-
+                String asd = e.toString();
             }
         }
     });

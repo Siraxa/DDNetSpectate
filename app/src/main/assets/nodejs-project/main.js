@@ -12,7 +12,7 @@ let io = socketIo(javaServer);
 let client;
 
 
-
+var firstSnapshot = true;
 	
 io.on('connection', (javaServer) => {
 
@@ -53,8 +53,10 @@ io.on('connection', (javaServer) => {
 		
 	//client = new teeworlds.Client(ip, port, "Axaris");
 
-			client = new teeworlds.Client("51.91.30.52", 8404, "Ax");
+			client = new teeworlds.Client("147.135.209.205", 8309, "Ax");
 			client.connect();
+			
+			
 			
 			client.on("message", message => {
 				/* {
@@ -80,6 +82,10 @@ io.on('connection', (javaServer) => {
 			});
 			
 			client.on("snapshot", () => {
+				if (firstSnapshot){
+					firstSnapshot = false;
+					 client.game.SetTeam(-1);
+				}
 				var snapshot = [];
 
 				for (var id = 0;id<128;id++){
